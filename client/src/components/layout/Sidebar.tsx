@@ -14,6 +14,8 @@ import {
   Building2
 } from 'lucide-react';
 
+import logoUrl from '@assets/Screenshot_2025-10-15_183825_1765652253224.png';
+
 export function Sidebar() {
   const { user, logout } = useAuth();
   const [location] = useLocation();
@@ -40,13 +42,7 @@ export function Sidebar() {
   return (
     <aside className="w-64 h-screen border-r border-white/10 bg-card/50 backdrop-blur-xl flex flex-col fixed left-0 top-0 z-50">
       <div className="p-6 flex items-center gap-3 border-b border-white/10">
-        <div className="w-10 h-10 rounded bg-gradient-to-br from-primary to-blue-600 flex items-center justify-center text-white font-bold text-xl shadow-[0_0_15px_rgba(6,182,212,0.5)]">
-          K
-        </div>
-        <div>
-          <h1 className="font-display font-bold text-lg tracking-wider text-white">KNOCKTURN</h1>
-          <p className="text-[10px] text-muted-foreground uppercase tracking-widest">Private Limited</p>
-        </div>
+        <img src={logoUrl} alt="Knockturn Logo" className="h-10 w-auto object-contain" />
       </div>
 
       <div className="flex-1 py-6 px-3 space-y-1 overflow-y-auto">

@@ -1,6 +1,7 @@
 import { getStoredLeaves } from '@/lib/storage';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart, Pie, Cell, LineChart, Line } from 'recharts';
+import { startOfYear, format, getMonth, parseISO } from 'date-fns';
 
 export default function Charts() {
   const leaves = getStoredLeaves();
@@ -29,19 +30,24 @@ export default function Charts() {
 
   const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042', '#8884d8'];
 
-  // Data for Line Chart (Trends) - Mocked based on months
-  const trendData = [
-    { name: 'Jan', leaves: 4 },
-    { name: 'Feb', leaves: 3 },
-    { name: 'Mar', leaves: 2 },
-    { name: 'Apr', leaves: 6 },
-    { name: 'May', leaves: 8 },
-    { name: 'Jun', leaves: 5 },
-    { name: 'Jul', leaves: 4 },
-    { name: 'Aug', leaves: 3 },
-    { name: 'Sep', leaves: 5 },
-    { name: 'Oct', leaves: leaves.length }, // Current leaves
-  ];
+  // Data for Line Chart (Trends) - Dynamic Calculation
+  const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+  const leavesByMonth = new Array(12).fill(0);
+
+  leaves.forEach(leave => {
+    try {
+      const date = parseISO(leave.startDate);
+      const monthIndex = getMonth(date);
+      leavesByMonth[monthIndex]++;
+    } catch (e) {
+      console.error("Invalid date", leave.startDate);
+    }
+  });
+
+  const trendData = months.map((month, index) => ({
+    name: month,
+    leaves: leavesByMonth[index]
+  }));
 
   return (
     <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-700">

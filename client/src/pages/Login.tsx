@@ -10,6 +10,8 @@ import { useToast } from '@/hooks/use-toast';
 import { useEffect, useRef } from 'react';
 import gsap from 'gsap';
 
+import logoUrl from '@assets/Screenshot_2025-10-15_183825_1765652253224.png';
+
 const loginSchema = z.object({
   code: z.string().min(1, "Employee Code is required"),
   password: z.string().min(1, "Password is required"), // Not strictly checked in mock, but good for UI
@@ -84,12 +86,8 @@ export default function Login() {
       </div>
 
       <div ref={containerRef} className="w-full max-w-md px-4 relative z-10">
-        <div className="mb-8 text-center login-element">
-          <div className="w-20 h-20 mx-auto mb-4 bg-gradient-to-br from-primary to-blue-600 rounded-2xl flex items-center justify-center shadow-[0_0_30px_rgba(6,182,212,0.4)] rotate-3">
-             <span className="text-4xl font-bold text-white">K</span>
-          </div>
-          <h1 className="font-display text-4xl font-bold text-white tracking-wider mb-2 drop-shadow-[0_0_10px_rgba(255,255,255,0.3)]">KNOCKTURN</h1>
-          <p className="text-muted-foreground uppercase tracking-[0.3em] text-sm">Private Limited</p>
+        <div className="mb-8 text-center login-element flex flex-col items-center">
+           <img src={logoUrl} alt="Knockturn Logo" className="w-64 h-auto object-contain mb-4 drop-shadow-[0_0_15px_rgba(6,182,212,0.5)]" />
         </div>
 
         <Card className="bg-card/50 backdrop-blur-xl border-white/10 shadow-2xl">
