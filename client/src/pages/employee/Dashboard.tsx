@@ -1,0 +1,110 @@
+import { useAuth } from '@/context/AuthContext';
+import { getStoredLeaves } from '@/lib/storage';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { CalendarDays, Clock, FileText, CheckCircle2, XCircle, AlertCircle } from 'lucide-react';
+import { Link } from 'wouter';
+import { format } from 'date-fns';
+
+export default function EmployeeDashboard() {
+  const { user } = useAuth();
+  const leaves = getStoredLeaves().filter(l => l.employeeCode === user?.code);
+  
+  const pending = leaves.filter(l => l.status === 'Pending').length;
+  const approved = leaves.filter(l => l.status === 'Approved').length;
+  const rejected = leaves.filter(l => l.status === 'Rejected').length;
+
+  return (
+    <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-700">
+      <div className="flex items-center justify-between">
+        <div>
+          <h2 className="text-3xl font-display font-bold text-white mb-2">Welcome, {user?.name.split(' ')[0]}</h2>
+          <p className="text-muted-foreground">Here's an overview of your leave status</p>
+        </div>
+        <Link href="/employee/apply-leave">
+          <Button className="bg-primary hover:bg-primary/90 text-primary-foreground font-bold shadow-[0_0_15px_rgba(6,182,212,0.5)]">
+            + Apply New Leave
+          </Button>
+        </Link>
+      </div>
+
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <Card className="bg-card/40 backdrop-blur border-white/5 hover:border-primary/50 transition-all duration-300 group">
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium text-muted-foreground">Pending Requests</CardTitle>
+            <Clock className="h-4 w-4 text-yellow-500 group-hover:scale-110 transition-transform" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-4xl font-bold text-white group-hover:text-yellow-500 transition-colors">{pending}</div>
+            <p className="text-xs text-muted-foreground mt-1">Awaiting approval</p>
+          </CardContent>
+        </Card>
+
+        <Card className="bg-card/40 backdrop-blur border-white/5 hover:border-primary/50 transition-all duration-300 group">
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium text-muted-foreground">Approved Leaves</CardTitle>
+            <CheckCircle2 className="h-4 w-4 text-green-500 group-hover:scale-110 transition-transform" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-4xl font-bold text-white group-hover:text-green-500 transition-colors">{approved}</div>
+            <p className="text-xs text-muted-foreground mt-1">Total approved this year</p>
+          </CardContent>
+        </Card>
+
+        <Card className="bg-card/40 backdrop-blur border-white/5 hover:border-primary/50 transition-all duration-300 group">
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium text-muted-foreground">Rejected/Cancelled</CardTitle>
+            <XCircle className="h-4 w-4 text-red-500 group-hover:scale-110 transition-transform" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-4xl font-bold text-white group-hover:text-red-500 transition-colors">{rejected}</div>
+            <p className="text-xs text-muted-foreground mt-1">Requests declined</p>
+          </CardContent>
+        </Card>
+      </div>
+
+      <div className="space-y-4">
+        <h3 className="text-xl font-display font-semibold text-white">Recent Activity</h3>
+        <div className="bg-card/30 border border-white/5 rounded-lg overflow-hidden backdrop-blur-sm">
+          {leaves.length === 0 ? (
+            <div className="p-8 text-center text-muted-foreground">
+              No leave history found.
+            </div>
+          ) : (
+            <div className="divide-y divide-white/5">
+              {leaves.slice(0, 5).map((leave) => (
+                <div key={leave.id} className="p-4 flex items-center justify-between hover:bg-white/5 transition-colors">
+                  <div className="flex items-center gap-4">
+                    <div className={`w-10 h-10 rounded-full flex items-center justify-center border ${
+                      leave.status === 'Approved' ? 'bg-green-500/10 border-green-500/20 text-green-500' :
+                      leave.status === 'Rejected' ? 'bg-red-500/10 border-red-500/20 text-red-500' :
+                      'bg-yellow-500/10 border-yellow-500/20 text-yellow-500'
+                    }`}>
+                      {leave.status === 'Approved' ? <CheckCircle2 className="w-5 h-5" /> :
+                       leave.status === 'Rejected' ? <XCircle className="w-5 h-5" /> :
+                       <Clock className="w-5 h-5" />}
+                    </div>
+                    <div>
+                      <p className="text-white font-medium">{leave.type} Leave</p>
+                      <p className="text-sm text-muted-foreground">{format(new Date(leave.startDate), 'MMM dd, yyyy')} - {leave.duration}</p>
+                    </div>
+                  </div>
+                  <div className="text-right">
+                    <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium border ${
+                      leave.status === 'Approved' ? 'bg-green-500/10 text-green-500 border-green-500/20' :
+                      leave.status === 'Rejected' ? 'bg-red-500/10 text-red-500 border-red-500/20' :
+                      'bg-yellow-500/10 text-yellow-500 border-yellow-500/20'
+                    }`}>
+                      {leave.status}
+                    </span>
+                    <p className="text-xs text-muted-foreground mt-1">Applied: {format(new Date(leave.appliedDate), 'MMM dd')}</p>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+}
