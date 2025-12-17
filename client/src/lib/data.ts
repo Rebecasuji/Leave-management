@@ -1,6 +1,6 @@
 // Mock Data and Type Definitions
 
-export type Role = 'Admin' | 'Employee';
+export type Role = 'Admin' | 'Employee' | 'HR';
 
 export interface User {
   id: string;
@@ -18,7 +18,7 @@ export interface LeaveRequest {
   employeeId: string;
   employeeName: string;
   employeeCode: string;
-  type: 'Casual' | 'Sick' | 'Study' | 'LWP' | 'Earned';
+  type: 'Casual' | 'Sick' | 'LWP' | 'Earned';
   startDate: string;
   endDate: string;
   duration: string; // "Full Day" | "Half Day"
@@ -48,13 +48,13 @@ export const INITIAL_USERS: User[] = [
   { id: '11', code: 'E0009', name: 'RANJITH', role: 'Employee', department: 'Sales' },
   { id: '12', code: 'E0044', name: 'PRIYA P', role: 'Employee', department: 'Marketing' },
   { id: '13', code: 'E0045', name: 'RATCHITHA', role: 'Employee', department: 'Operations' },
-  { id: '14', code: 'E0047', name: 'Samyuktha S', role: 'Employee', department: 'HR' },
+  { id: '14', code: 'E0047', name: 'Samyuktha S', role: 'HR', department: 'HR' },
   { id: '15', code: 'E0046', name: 'Rebecasuji.A', role: 'Employee', department: 'Engineering' },
   { id: '16', code: 'E0048', name: 'DurgaDevi E', role: 'Employee', department: 'Sales' },
   { id: '17', code: 'E0050', name: 'ZAMEELA BEGAM N.', role: 'Employee', department: 'Marketing' },
   { id: '18', code: 'E0051', name: 'ARUN KUMAR V.', role: 'Employee', department: 'Operations' },
   { id: '19', code: 'E0052', name: 'D K JYOTHSNA PRIYA', role: 'Employee', department: 'HR' },
-  { id: '20', code: 'E0049', name: 'P PUSHPA', role: 'Employee', department: 'Engineering' },
+  { id: '20', code: 'E0049', name: 'P PUSHPA', role: 'HR', department: 'Engineering' },
   { id: '21', code: '-', name: 'FAREETHA', role: 'Employee', department: 'General' },
 ];
 

@@ -51,3 +51,37 @@ export function addUser(user: User) {
   localStorage.setItem(USERS_KEY, JSON.stringify(users));
   return users;
 }
+
+export interface LeaveBalance {
+  casual: { total: number; used: number; remaining: number };
+  sick: { total: number; used: number; remaining: number };
+}
+
+export function getLeaveBalance(employeeCode: string): LeaveBalance {
+  const leaves = getStoredLeaves();
+  const employeeLeaves = leaves.filter(
+    l => l.employeeCode === employeeCode && l.status === 'Approved'
+  );
+
+  const casualUsed = employeeLeaves
+    .filter(l => l.type === 'Casual')
+    .length; // Assuming 1 leave request = 1 day for simplicity in this mock. 
+             // Ideally we'd calculate days between startDate and endDate.
+  
+  const sickUsed = employeeLeaves
+    .filter(l => l.type === 'Sick')
+    .length;
+
+  return {
+    casual: {
+      total: 10,
+      used: casualUsed,
+      remaining: Math.max(0, 10 - casualUsed)
+    },
+    sick: {
+      total: 5,
+      used: sickUsed,
+      remaining: Math.max(0, 5 - sickUsed)
+    }
+  };
+}

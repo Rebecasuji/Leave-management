@@ -1,6 +1,6 @@
 import { useForm } from 'react-hook-form';
 import { useAuth } from '@/context/AuthContext';
-import { addLeaveRequest } from '@/lib/storage';
+import { addLeaveRequest, getLeaveBalance } from '@/lib/storage';
 import { useLocation } from 'wouter';
 import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -12,9 +12,10 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { Label } from '@/components/ui/label';
 import { useToast } from '@/hooks/use-toast';
+import { AlertCircle } from 'lucide-react';
 
 const leaveSchema = z.object({
-  type: z.enum(['Casual', 'Sick', 'Study', 'LWP', 'Earned']),
+  type: z.enum(['Casual', 'Sick', 'LWP', 'Earned']),
   startDate: z.string().min(1, "Start date is required"),
   endDate: z.string().min(1, "End date is required"),
   duration: z.enum(['Full Day', 'Half Day']),
@@ -27,6 +28,7 @@ export default function ApplyLeave() {
   const { user } = useAuth();
   const [, setLocation] = useLocation();
   const { toast } = useToast();
+  const balance = user ? getLeaveBalance(user.code) : null;
 
   const form = useForm<LeaveForm>({
     resolver: zodResolver(leaveSchema),
@@ -38,6 +40,15 @@ export default function ApplyLeave() {
 
   const onSubmit = (data: LeaveForm) => {
     if (!user) return;
+
+    // Optional: Check balance before submitting (soft check)
+    if (data.type === 'Casual' && balance && balance.casual.remaining <= 0) {
+      toast({
+        title: "Warning",
+        description: "You have exhausted your Casual Leave quota. This may be processed as LWP.",
+        variant: "destructive"
+      });
+    }
 
     addLeaveRequest({
       id: Math.random().toString(36).substr(2, 9),
@@ -60,9 +71,27 @@ export default function ApplyLeave() {
 
   return (
     <div className="max-w-2xl mx-auto animate-in fade-in slide-in-from-bottom-8 duration-700">
-      <div className="mb-6">
-        <h2 className="text-3xl font-display font-bold text-white mb-2">Apply for Leave</h2>
-        <p className="text-muted-foreground">Submit your leave request for approval</p>
+      <div className="mb-6 flex justify-between items-start">
+        <div>
+          <h2 className="text-3xl font-display font-bold text-white mb-2">Apply for Leave</h2>
+          <p className="text-muted-foreground">Submit your leave request for approval</p>
+        </div>
+        {balance && (
+          <div className="flex gap-4 text-xs">
+            <div className="bg-card/40 border border-white/10 px-3 py-2 rounded-md">
+              <span className="text-gray-400 block">Casual Balance</span>
+              <span className={`font-bold ${balance.casual.remaining === 0 ? 'text-red-500' : 'text-primary'}`}>
+                {balance.casual.remaining} / {balance.casual.total}
+              </span>
+            </div>
+            <div className="bg-card/40 border border-white/10 px-3 py-2 rounded-md">
+              <span className="text-gray-400 block">Sick Balance</span>
+              <span className={`font-bold ${balance.sick.remaining === 0 ? 'text-red-500' : 'text-primary'}`}>
+                {balance.sick.remaining} / {balance.sick.total}
+              </span>
+            </div>
+          </div>
+        )}
       </div>
 
       <Card className="bg-card/50 backdrop-blur-xl border-white/10 shadow-2xl">
@@ -78,7 +107,6 @@ export default function ApplyLeave() {
                 <SelectContent className="bg-card border-white/10 text-white">
                   <SelectItem value="Casual">Casual Leave</SelectItem>
                   <SelectItem value="Sick">Sick Leave</SelectItem>
-                  <SelectItem value="Study">Study Leave</SelectItem>
                   <SelectItem value="LWP">Leave Without Pay (LWP)</SelectItem>
                   <SelectItem value="Earned">Earned Leave</SelectItem>
                 </SelectContent>

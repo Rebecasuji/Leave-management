@@ -37,7 +37,15 @@ export function Sidebar() {
     { icon: BarChart3, label: 'Analytics', path: '/admin/charts' },
   ];
 
-  const links = user?.role === 'Admin' ? adminLinks : employeeLinks;
+  const hrLinks = [
+    { icon: LayoutDashboard, label: 'Dashboard', path: '/employee/dashboard' },
+    { icon: CheckSquare, label: 'Approve Leaves', path: '/admin/view-leaves' },
+    { icon: FileText, label: 'Apply Leave', path: '/employee/apply-leave' },
+    { icon: History, label: 'Leave History', path: '/employee/history' },
+    { icon: User, label: 'Profile', path: '/employee/profile' },
+  ];
+
+  const links = user?.role === 'Admin' ? adminLinks : (user?.role === 'HR' ? hrLinks : employeeLinks);
 
   return (
     <aside className="w-64 h-screen border-r border-white/10 bg-card/50 backdrop-blur-xl flex flex-col fixed left-0 top-0 z-50">

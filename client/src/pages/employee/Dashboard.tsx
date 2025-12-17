@@ -1,14 +1,15 @@
 import { useAuth } from '@/context/AuthContext';
-import { getStoredLeaves } from '@/lib/storage';
+import { getStoredLeaves, getLeaveBalance } from '@/lib/storage';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { CalendarDays, Clock, FileText, CheckCircle2, XCircle, AlertCircle } from 'lucide-react';
+import { CalendarDays, Clock, FileText, CheckCircle2, XCircle, AlertCircle, PieChart } from 'lucide-react';
 import { Link } from 'wouter';
 import { format } from 'date-fns';
 
 export default function EmployeeDashboard() {
   const { user } = useAuth();
   const leaves = getStoredLeaves().filter(l => l.employeeCode === user?.code);
+  const balance = user ? getLeaveBalance(user.code) : null;
   
   const pending = leaves.filter(l => l.status === 'Pending').length;
   const approved = leaves.filter(l => l.status === 'Approved').length;
@@ -28,10 +29,31 @@ export default function EmployeeDashboard() {
         </Link>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
         <Card className="bg-card/40 backdrop-blur border-white/5 hover:border-primary/50 transition-all duration-300 group">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium text-muted-foreground">Pending Requests</CardTitle>
+            <CardTitle className="text-sm font-medium text-muted-foreground">Leave Quota</CardTitle>
+            <PieChart className="h-4 w-4 text-primary group-hover:scale-110 transition-transform" />
+          </CardHeader>
+          <CardContent>
+            {balance && (
+              <div className="space-y-2">
+                <div className="flex justify-between text-sm">
+                   <span className="text-gray-400">Casual</span>
+                   <span className="font-bold text-white">{balance.casual.remaining}/{balance.casual.total}</span>
+                </div>
+                <div className="flex justify-between text-sm">
+                   <span className="text-gray-400">Sick</span>
+                   <span className="font-bold text-white">{balance.sick.remaining}/{balance.sick.total}</span>
+                </div>
+              </div>
+            )}
+          </CardContent>
+        </Card>
+
+        <Card className="bg-card/40 backdrop-blur border-white/5 hover:border-primary/50 transition-all duration-300 group">
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium text-muted-foreground">Pending</CardTitle>
             <Clock className="h-4 w-4 text-yellow-500 group-hover:scale-110 transition-transform" />
           </CardHeader>
           <CardContent>
@@ -42,7 +64,7 @@ export default function EmployeeDashboard() {
 
         <Card className="bg-card/40 backdrop-blur border-white/5 hover:border-primary/50 transition-all duration-300 group">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium text-muted-foreground">Approved Leaves</CardTitle>
+            <CardTitle className="text-sm font-medium text-muted-foreground">Approved</CardTitle>
             <CheckCircle2 className="h-4 w-4 text-green-500 group-hover:scale-110 transition-transform" />
           </CardHeader>
           <CardContent>
@@ -53,7 +75,7 @@ export default function EmployeeDashboard() {
 
         <Card className="bg-card/40 backdrop-blur border-white/5 hover:border-primary/50 transition-all duration-300 group">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium text-muted-foreground">Rejected/Cancelled</CardTitle>
+            <CardTitle className="text-sm font-medium text-muted-foreground">Rejected</CardTitle>
             <XCircle className="h-4 w-4 text-red-500 group-hover:scale-110 transition-transform" />
           </CardHeader>
           <CardContent>

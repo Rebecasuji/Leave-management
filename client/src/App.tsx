@@ -11,7 +11,7 @@ import ViewLeaves from '@/pages/admin/ViewLeaves';
 import Charts from '@/pages/admin/Charts';
 import Employees from '@/pages/admin/Employees';
 
-function ProtectedRoute({ component: Component, role }: { component: any, role?: 'Admin' | 'Employee' }) {
+function ProtectedRoute({ component: Component, role }: { component: any, role?: 'Admin' | 'Employee' | 'HR' }) {
   const { user, isLoading } = useAuth();
   const [, setLocation] = useLocation();
 
@@ -27,8 +27,22 @@ function ProtectedRoute({ component: Component, role }: { component: any, role?:
     return null;
   }
 
-  if (role && user.role !== role) {
-    return <div className="text-white p-8">Unauthorized Access</div>;
+  // Role check logic
+  // Admin can access everything (in this simple mock, or we restrict them from employee pages?)
+  // For now:
+  // - Admin role requires user.role === 'Admin'
+  // - HR role requires user.role === 'HR'
+  // - Employee role allows 'Employee', 'HR' (since HR is also an employee), and 'Admin' (optional, but Admin usually has separate dash)
+  
+  if (role) {
+    if (role === 'Admin' && user.role !== 'Admin' && user.role !== 'HR') {
+         // Allow HR to access Admin pages like View Leaves?
+         // We'll handle specific page permissions below or in the route definition
+         return <div className="text-white p-8">Unauthorized Access</div>;
+    }
+    if (role === 'Employee' && (user.role !== 'Employee' && user.role !== 'HR' && user.role !== 'Admin')) {
+        return <div className="text-white p-8">Unauthorized Access</div>;
+    }
   }
 
   return (
@@ -43,7 +57,7 @@ function AppRoutes() {
     <Switch>
       <Route path="/" component={Login} />
       
-      {/* Employee Routes */}
+      {/* Employee Routes - Accessible by Employee and HR */}
       <Route path="/employee/dashboard">
         <ProtectedRoute component={EmployeeDashboard} role="Employee" />
       </Route>
@@ -62,7 +76,8 @@ function AppRoutes() {
         <ProtectedRoute component={AdminDashboard} role="Admin" />
       </Route>
       <Route path="/admin/view-leaves">
-        <ProtectedRoute component={ViewLeaves} role="Admin" />
+        {/* HR needs access to View Leaves */}
+        <ProtectedRoute component={ViewLeaves} role="Admin" /> 
       </Route>
       <Route path="/admin/departments">
          <ProtectedRoute component={Employees} role="Admin" />

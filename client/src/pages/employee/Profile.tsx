@@ -1,13 +1,15 @@
 import { useAuth } from '@/context/AuthContext';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Progress } from '@/components/ui/progress';
-import { User as UserIcon, Mail, Briefcase, Building } from 'lucide-react';
-import { getStoredLeaves } from '@/lib/storage';
+import { User as UserIcon, Mail, Briefcase, Building, AlertCircle } from 'lucide-react';
+import { getStoredLeaves, getLeaveBalance } from '@/lib/storage';
 
 export default function Profile() {
   const { user } = useAuth();
   
   if (!user) return null;
+
+  const balance = getLeaveBalance(user.code);
 
   // Mock calculation for worked days
   // In a real app, this would calculate actual working days minus leaves
@@ -81,20 +83,30 @@ export default function Profile() {
 
         <Card className="bg-card/40 backdrop-blur border-white/10">
           <CardHeader>
-            <CardTitle className="text-white">Reporting Details</CardTitle>
+            <CardTitle className="text-white">Leave Balance</CardTitle>
           </CardHeader>
-          <CardContent className="space-y-4">
-             <div className="flex justify-between items-center py-2 border-b border-white/5">
-               <span className="text-gray-400">Reporting Manager</span>
-               <span className="text-white font-medium">SAM PARKESH (A0001)</span>
-             </div>
-             <div className="flex justify-between items-center py-2 border-b border-white/5">
-               <span className="text-gray-400">HR Representative</span>
-               <span className="text-white font-medium">D K JYOTHSNA PRIYA (E0052)</span>
-             </div>
-             <div className="flex justify-between items-center py-2">
-               <span className="text-gray-400">Shift Timing</span>
-               <span className="text-white font-medium">09:00 AM - 06:00 PM</span>
+          <CardContent className="space-y-6">
+             <div className="space-y-4">
+                <div className="space-y-2">
+                  <div className="flex justify-between text-sm">
+                    <span className="text-gray-400">Personal (Casual) Leave</span>
+                    <span className="text-white font-mono">{balance.casual.remaining} / {balance.casual.total}</span>
+                  </div>
+                  <Progress value={(balance.casual.used / balance.casual.total) * 100} className="h-2 bg-blue-900/50" />
+                </div>
+                
+                <div className="space-y-2">
+                  <div className="flex justify-between text-sm">
+                    <span className="text-gray-400">Sick Leave</span>
+                    <span className="text-white font-mono">{balance.sick.remaining} / {balance.sick.total}</span>
+                  </div>
+                  <Progress value={(balance.sick.used / balance.sick.total) * 100} className="h-2 bg-purple-900/50" />
+                </div>
+                
+                <div className="pt-2 border-t border-white/5 text-xs text-muted-foreground flex items-center gap-2">
+                   <AlertCircle className="w-3 h-3 text-primary" />
+                   <span>Balances reset on Jan 1st of every year.</span>
+                </div>
              </div>
           </CardContent>
         </Card>
