@@ -3,15 +3,14 @@
   "version": "1.0.0",
   "type": "module",
   "license": "MIT",
- {
+
   "scripts": {
-  "dev": "cross-env NODE_ENV=development tsx server/index.ts",
-  "build": "tsc -p tsconfig.server.json",
-  "start": "node dist/server/index.js",
-  "check": "tsc",
-  "db:push": "drizzle-kit push"
-}
-} 
+    "dev": "cross-env NODE_ENV=development tsx server/index.ts",
+    "build": "tsc -p tsconfig.server.json",
+    "start": "node dist/server/index.js",
+    "check": "tsc",
+    "db:push": "drizzle-kit push"
+  },
 
   "dependencies": {
     "@hookform/resolvers": "^3.10.0",
@@ -80,6 +79,7 @@
     "zod": "^3.25.76",
     "zod-validation-error": "^3.4.0"
   },
+
   "devDependencies": {
     "@replit/vite-plugin-cartographer": "^0.4.4",
     "@replit/vite-plugin-dev-banner": "^0.1.1",
@@ -105,6 +105,7 @@
     "typescript": "5.6.3",
     "vite": "^7.1.9"
   },
+
   "optionalDependencies": {
     "bufferutil": "^4.0.8"
   }
